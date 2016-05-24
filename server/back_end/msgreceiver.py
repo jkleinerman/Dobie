@@ -1,12 +1,12 @@
 import pymysql
 import queue
 import logging
+import json
 
 import genmngr
 import database
 from config import *
-
-
+from msgheaders import *
 
 
 class MsgReceiver(genmngr.GenericMngr):
@@ -31,12 +31,28 @@ class MsgReceiver(genmngr.GenericMngr):
         for queue messages coming from the "Network" thread.
         '''
 
+
         while True:
             try:
                 #Blocking until Main thread sends an event or EXIT_CHECK_TIME expires 
-                events = self.netToMsgRec.get(timeout=EXIT_CHECK_TIME)
+                msg = self.netToMsgRec.get(timeout=EXIT_CHECK_TIME)
                 self.checkExit()
-                self.dataBase.saveEvents(events)
+
+                if msg.startswith(EVT):
+
+                    event = msg.strip(EVT+END).decode('utf8')
+                    event = json.loads(event)
+                    events = [event]
+                    self.dataBase.saveEvents(events)
+
+
+                elif msg.startswith(EVS):
+
+                    events = msg[1:-1].split(EVS)
+                    events = [json.loads(evnt.decode('utf8')) for evnt in events]
+                    self.dataBase.saveEvents(events)
+
+
 
             except queue.Empty:
                 #Cheking if Main thread ask as to finish.
