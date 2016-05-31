@@ -2,6 +2,7 @@ import pymysql
 import queue
 import logging
 import json
+import re
 
 import genmngr
 import database
@@ -51,6 +52,13 @@ class MsgReceiver(genmngr.GenericMngr):
                     events = msg[1:-1].split(EVS)
                     events = [json.loads(evnt.decode('utf8')) for evnt in events]
                     self.dataBase.saveEvents(events)
+
+
+                elif msg.startswith(RCUD):
+                    
+                    m = msg.strip(RCUD+END).decode('utf8')
+
+                    print(m)
 
 
 
