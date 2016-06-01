@@ -56,9 +56,12 @@ class MsgReceiver(genmngr.GenericMngr):
 
                 elif msg.startswith(RCUD):
                     
-                    m = msg.strip(RCUD+END).decode('utf8')
+                    crudResponse = msg.strip(RCUD+END).decode('utf8')
+                    passageId = re.search('"id":\s*(\d*)', crudResponse).groups()[0]
+                    self.dataBase.commitPassage(passageId)
+                    
 
-                    print(m)
+                    print(passageId)
 
 
 
