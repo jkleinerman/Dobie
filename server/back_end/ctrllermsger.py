@@ -58,3 +58,7 @@ class CtrllerMsger(object):
         msg = CUD + b'S' + b'D' + b'{"id": ' + passageId + b'}' + END
         self.netMngr.sendToCtrller(msg, ctrllerMac)
 
+
+    def addAccess(self, ctrllerMac, person, access):
+        print(ctrllerMac, person, access)
+
