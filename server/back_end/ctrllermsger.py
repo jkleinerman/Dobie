@@ -59,6 +59,15 @@ class CtrllerMsger(object):
         self.netMngr.sendToCtrller(msg, ctrllerMac)
 
 
-    def addAccess(self, ctrllerMac, person, access):
-        print(ctrllerMac, person, access)
+    def addAccess(self, ctrllerMac, access):
+        '''
+        Receives the controller MAC, person dictionary and access dictionary.
+        With them it creates the message to send it to controller (to add).
+        It gives the created message to the network manager thread.
+        '''
+        
+        accessJson = json.dumps(access).encode('utf8')
+
+        msg = CUD + b'A' + b'C' + accessJson + END
+        self.netMngr.sendToCtrller(msg, ctrllerMac)
 
