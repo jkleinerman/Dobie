@@ -19,6 +19,13 @@ class MsgReceiver(genmngr.GenericMngr):
         super().__init__('MsgReceiver', exitFlag)
 
         self.dataBase = database.DataBase(DB_HOST, DB_USER, DB_PASSWD, DB_DATABASE)
+
+
+        self.commitHndlrs = {'S': self.dataBase.commitPassage,
+                             'A': self.dataBase.commitAccess,
+                            }
+
+
     
         self.netToMsgRec = queue.Queue()
 
@@ -57,11 +64,9 @@ class MsgReceiver(genmngr.GenericMngr):
                 elif msg.startswith(RCUD):
                     
                     crudResponse = msg.strip(RCUD+END).decode('utf8')
-                    passageId = re.search('"id":\s*(\d*)', crudResponse).groups()[0]
-                    self.dataBase.commitPassage(passageId)
-                    
-
-                    print(passageId)
+                    crudId = re.search('"id":\s*(\d*)', crudResponse).groups()[0]
+                    respCrudType = crudResponse[0]
+                    self.commitHndlrs[respCrudType](crudId)
 
 
 
