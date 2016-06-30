@@ -65,8 +65,8 @@ class MsgReceiver(genmngr.GenericMngr):
                     
                     crudResponse = msg.strip(RCUD+END).decode('utf8')
                     crudId = re.search('"id":\s*(\d*)', crudResponse).groups()[0]
-                    respCrudType = crudResponse[0]
-                    self.commitHndlrs[respCrudType](crudId)
+                    crudTypeResp = crudResponse[0]
+                    self.commitHndlrs[crudTypeResp](crudId)
 
 
 
