@@ -85,3 +85,15 @@ class CtrllerMsger(object):
         msg = CUD + b'A' + b'U' + accessJson + END
         self.netMngr.sendToCtrller(msg, ctrllerMac)
 
+
+    def delAccess(self, ctrllerMac, accessId):
+        '''
+        Receives the controller MAC and the access ID.
+        With them it creates the message to send it to controller (to delete).
+        It gives the created message to the network manager thread.
+        '''
+        accessId = str(accessId).encode('utf8')
+        msg = CUD + b'A' + b'D' + b'{"id": ' + accessId + b'}' + END
+        self.netMngr.sendToCtrller(msg, ctrllerMac)
+
+
