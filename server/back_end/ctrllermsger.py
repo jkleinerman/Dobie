@@ -97,3 +97,47 @@ class CtrllerMsger(object):
         self.netMngr.sendToCtrller(msg, ctrllerMac)
 
 
+    def addLiAccess(self, ctrllerMac, liAccess):
+        '''
+        Receives the controller MAC and limited access dictionary.
+        The limited access dictionary has some person parameters.
+        With them it creates the message to send it to controller (to add).
+        It gives the created message to the network manager thread.
+        '''
+
+        liAccessJson = json.dumps(liAccess).encode('utf8')
+
+        msg = CUD + b'L' + b'C' + liAccessJson + END
+        self.netMngr.sendToCtrller(msg, ctrllerMac)
+
+
+    def updLiAccess(self, ctrllerMac, liAccess):
+        '''
+        Receives the controller MAC and limited access dictionary.
+        With them it creates the message to send it to controller (to update).
+        It gives the created message to the network manager thread.
+        '''
+
+        liAccessJson = json.dumps(liAccess).encode('utf8')
+
+        msg = CUD + b'L' + b'U' + liAccessJson + END
+        self.netMngr.sendToCtrller(msg, ctrllerMac)
+
+
+    def delLiAccess(self, ctrllerMac, liAccessId):
+        '''
+        Receives the controller MAC and the access ID.
+        With them it creates the message to send it to controller (to delete).
+        It gives the created message to the network manager thread.
+        '''
+        liAccessId = str(liAccessId).encode('utf8')
+        msg = CUD + b'L' + b'D' + b'{"id": ' + liAccessId + b'}' + END
+        self.netMngr.sendToCtrller(msg, ctrllerMac)
+
+
+
+
+
+
+
+

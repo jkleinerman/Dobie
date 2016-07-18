@@ -23,6 +23,7 @@ class MsgReceiver(genmngr.GenericMngr):
 
         self.commitHndlrs = {'S': self.dataBase.commitPassage,
                              'A': self.dataBase.commitAccess,
+                             'L': self.dataBase.commitLiAccess
                             }
 
 
