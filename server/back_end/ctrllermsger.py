@@ -126,7 +126,7 @@ class CtrllerMsger(object):
 
     def delLiAccess(self, ctrllerMac, liAccessId):
         '''
-        Receives the controller MAC and the access ID.
+        Receives the controller MAC and the limited access ID.
         With them it creates the message to send it to controller (to delete).
         It gives the created message to the network manager thread.
         '''

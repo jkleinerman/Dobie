@@ -11,6 +11,13 @@ from msgheaders import *
 
 
 class MsgReceiver(genmngr.GenericMngr):
+    '''
+    This thread is created by the main thread.
+    When the network thread receives a message from the controller, it 
+    put the message in "netToMsgRec" queue. This thread get the message
+    from the queue and do the necessary operation with DB. In this way
+    the network thread do not lose time doing things in DB.
+    '''
 
     def __init__(self, exitFlag):
 
@@ -20,13 +27,10 @@ class MsgReceiver(genmngr.GenericMngr):
 
         self.dataBase = database.DataBase(DB_HOST, DB_USER, DB_PASSWD, DB_DATABASE)
 
-
         self.commitHndlrs = {'S': self.dataBase.commitPassage,
                              'A': self.dataBase.commitAccess,
                              'L': self.dataBase.commitLiAccess
                             }
-
-
     
         self.netToMsgRec = queue.Queue()
 
@@ -43,10 +47,11 @@ class MsgReceiver(genmngr.GenericMngr):
 
         while True:
             try:
-                #Blocking until Main thread sends an event or EXIT_CHECK_TIME expires 
+                #Blocking until Network thread sends an msg or EXIT_CHECK_TIME expires 
                 msg = self.netToMsgRec.get(timeout=EXIT_CHECK_TIME)
                 self.checkExit()
 
+                #When the controller sends an Event
                 if msg.startswith(EVT):
 
                     event = msg.strip(EVT+END).decode('utf8')
@@ -54,7 +59,7 @@ class MsgReceiver(genmngr.GenericMngr):
                     events = [event]
                     self.dataBase.saveEvents(events)
 
-
+                #When the controller sends many Events (Retransmitting)
                 elif msg.startswith(EVS):
 
                     events = msg[1:-1].split(EVS)
@@ -62,6 +67,7 @@ class MsgReceiver(genmngr.GenericMngr):
                     self.dataBase.saveEvents(events)
 
 
+                #When the controller sends a response to CRUD message
                 elif msg.startswith(RCUD):
                     
                     crudResponse = msg.strip(RCUD+END).decode('utf8')
@@ -70,20 +76,10 @@ class MsgReceiver(genmngr.GenericMngr):
                     self.commitHndlrs[crudTypeResp](crudId)
 
 
-
             except queue.Empty:
                 #Cheking if Main thread ask as to finish.
                 self.checkExit()
 
 
 
-
-
-
-
-
-    #def __del__(self):
-   
-        #self.connection.commit() 
-        #self.connection.close()
 
