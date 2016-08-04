@@ -137,7 +137,12 @@ class CtrllerMsger(object):
 
 
 
-
+    def delPerson(self, ctrllerMacsToDelPrsn, personId):
+        '''
+        Receives a list of controller MAC addresses to send the delete person msg.
+        With the person ID creates the message to send to the controllers
+        '''
+        pass
 
 
 
