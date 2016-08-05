@@ -142,7 +142,10 @@ class CtrllerMsger(object):
         Receives a list of controller MAC addresses to send the delete person msg.
         With the person ID creates the message to send to the controllers
         '''
-        pass
-
+        personId = str(personId).encode('utf8')
+        msg = CUD + b'P' + b'D' + b'{"id": ' + personId + b'}' + END
+        
+        for ctrllerMac in ctrllerMacsToDelPrsn:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
 
 
