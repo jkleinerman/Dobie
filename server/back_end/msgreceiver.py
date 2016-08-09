@@ -29,7 +29,8 @@ class MsgReceiver(genmngr.GenericMngr):
 
         self.commitHndlrs = {'S': self.dataBase.commitPassage,
                              'A': self.dataBase.commitAccess,
-                             'L': self.dataBase.commitLiAccess
+                             'L': self.dataBase.commitLiAccess,
+                             'P': self.dataBase.commitPerson
                             }
     
         self.netToMsgRec = queue.Queue()
