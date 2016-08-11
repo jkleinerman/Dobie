@@ -74,7 +74,12 @@ class MsgReceiver(genmngr.GenericMngr):
                     crudResponse = msg.strip(RCUD+END).decode('utf8')
                     crudId = re.search('"id":\s*(\d*)', crudResponse).groups()[0]
                     crudTypeResp = crudResponse[0]
-                    self.commitHndlrs[crudTypeResp](crudId)
+
+                    if crudTypeResp == 'P':
+                        ctrllerMac = re.search('"mac":\s*(\w{12})', crudResponse).groups()[0]
+                        self.dataBase.commitPerson(crudId, ctrllerMac)
+                    else:
+                        self.commitHndlrs[crudTypeResp](crudId)
 
 
             except queue.Empty:
