@@ -75,6 +75,9 @@ class MsgReceiver(genmngr.GenericMngr):
                     crudId = re.search('"id":\s*(\d*)', crudResponse).groups()[0]
                     crudTypeResp = crudResponse[0]
 
+                    #When a response from an update or delete person is received, it is
+                    #necessary to pass to commitPerson method the controller MAC.
+                    #The rest of commit methods just need the crudId.
                     if crudTypeResp == 'P':
                         ctrllerMac = re.search('"mac":\s*(\w{12})', crudResponse).groups()[0]
                         self.dataBase.commitPerson(crudId, ctrllerMac)
