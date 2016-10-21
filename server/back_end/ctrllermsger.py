@@ -163,9 +163,14 @@ class CtrllerMsger(object):
 
 
 
-    def verifyIsAlive(self, ctrllerMac):
+    def verifyIsAlive(self, ctrllerMacsNotComm):
         '''
         Send a special message to controller to check if it is alive
         '''
-        pass
+
+        msg = CUD + b'A' + b'A' + END
+
+        for ctrllerMac in ctrllerMacsNotComm:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+
 
