@@ -168,7 +168,7 @@ class CtrllerMsger(object):
         Send a special message to controller to check if it is alive
         '''
 
-        msg = CUD + b'A' + b'A' + END
+        msg = VAL + END
 
         for ctrllerMac in ctrllerMacsNotComm:
             self.netMngr.sendToCtrller(msg, ctrllerMac)
