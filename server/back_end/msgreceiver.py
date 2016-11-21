@@ -29,7 +29,8 @@ class MsgReceiver(genmngr.GenericMngr):
 
         self.commitHndlrs = {'S': self.dataBase.commitPassage,
                              'A': self.dataBase.commitAccess,
-                             'L': self.dataBase.commitLiAccess
+                             'L': self.dataBase.commitLiAccess,
+                             'P': self.dataBase.commitPerson
                             }
     
         self.netToMsgRec = queue.Queue()
@@ -73,7 +74,15 @@ class MsgReceiver(genmngr.GenericMngr):
                     crudResponse = msg.strip(RCUD+END).decode('utf8')
                     crudId = re.search('"id":\s*(\d*)', crudResponse).groups()[0]
                     crudTypeResp = crudResponse[0]
-                    self.commitHndlrs[crudTypeResp](crudId)
+
+                    #When a response from an update or delete person is received, it is
+                    #necessary to pass to commitPerson method the controller MAC.
+                    #The rest of commit methods just need the crudId.
+                    if crudTypeResp == 'P':
+                        ctrllerMac = re.search('"mac":\s*(\w{12})', crudResponse).groups()[0]
+                        self.dataBase.commitPerson(crudId, ctrllerMac)
+                    else:
+                        self.commitHndlrs[crudTypeResp](crudId)
 
 
             except queue.Empty:

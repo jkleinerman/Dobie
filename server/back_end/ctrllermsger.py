@@ -136,6 +136,19 @@ class CtrllerMsger(object):
 
 
 
+    def updPerson(self, ctrllerMacsToUpdPrsn, person):
+        '''
+        Receives a list of controller MAC addresses to send the update person msg
+        and a person dictionary to create the message.
+        '''
+        personJson = json.dumps(person).encode('utf8')
+
+        msg = CUD + b'P' + b'U' + personJson + END
+
+        for ctrllerMac in ctrllerMacsToUpdPrsn:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+
+
 
     def delPerson(self, ctrllerMacsToDelPrsn, personId):
         '''
@@ -146,6 +159,18 @@ class CtrllerMsger(object):
         msg = CUD + b'P' + b'D' + b'{"id": ' + personId + b'}' + END
         
         for ctrllerMac in ctrllerMacsToDelPrsn:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+
+
+
+    def verifyIsAlive(self, ctrllerMacsNotComm):
+        '''
+        Send a special message to controller to check if it is alive
+        '''
+
+        msg = VAL + END
+
+        for ctrllerMac in ctrllerMacsNotComm:
             self.netMngr.sendToCtrller(msg, ctrllerMac)
 
 

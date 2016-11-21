@@ -22,3 +22,4 @@ RCUD = bytes([int_RCUD])
 VAL  = bytes([int_VAL])
 RVAL = bytes([int_RVAL])
 END  = bytes([int_END])
+
