@@ -163,12 +163,12 @@ class CtrllerMsger(object):
 
 
 
-    def verifyIsAlive(self, ctrllerMacsNotComm):
+    def requestReProvision(self, ctrllerMacsNotComm):
         '''
-        Send a special message to controller to check if it is alive
+        Send a message to the controller requesting reprovisioning it.
         '''
 
-        msg = VAL + END
+        msg = RPR + END
 
         for ctrllerMac in ctrllerMacsNotComm:
             self.netMngr.sendToCtrller(msg, ctrllerMac)
