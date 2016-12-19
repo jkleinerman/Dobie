@@ -163,14 +163,26 @@ class CtrllerMsger(object):
 
 
 
-    def requestReProvision(self, ctrllerMacsNotComm):
+    def requestReSendCruds(self, ctrllerMacsNotComm):
         '''
-        Send a message to the controller requesting reprovisioning it.
+        Send a message to the controller requesting re sending uncommitted CRUDs.
         '''
 
-        msg = RPR + END
+        msg = RRC + END
 
         for ctrllerMac in ctrllerMacsNotComm:
             self.netMngr.sendToCtrller(msg, ctrllerMac)
+
+
+
+
+    def requestReProv(self, ctrllerMac):
+        '''
+        Send a message to the controller requesting to be reprovisioned entirely.
+        '''
+
+        msg = RRP + END
+        self.netMngr.sendToCtrller(msg, ctrllerMac)
+
 
 
