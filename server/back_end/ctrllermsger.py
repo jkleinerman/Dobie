@@ -23,6 +23,9 @@ class CtrllerMsger(object):
         '''
         self.netMngr = netMngr
 
+        #Getting the logger
+        self.logger = logging.getLogger(LOGGER_NAME)
+
 
 
     def addPassage(self, ctrllerMac, passage):
@@ -33,7 +36,10 @@ class CtrllerMsger(object):
         '''
         passageJson = json.dumps(passage).encode('utf8')
         msg = CUD + b'S' + b'C' + passageJson + END 
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to add passage")
 
 
     def updPassage(self, ctrllerMac, passage):
@@ -44,7 +50,10 @@ class CtrllerMsger(object):
         '''
         passageJson = json.dumps(passage).encode('utf8')
         msg = CUD + b'S' + b'U' + passageJson + END
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to update passage")
 
 
 
@@ -56,7 +65,10 @@ class CtrllerMsger(object):
         '''
         passageId = str(passageId).encode('utf8')
         msg = CUD + b'S' + b'D' + b'{"id": ' + passageId + b'}' + END
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to delete passage")
 
 
     def addAccess(self, ctrllerMac, access):
@@ -66,11 +78,12 @@ class CtrllerMsger(object):
         With them it creates the message to send it to controller (to add).
         It gives the created message to the network manager thread.
         '''
-        
         accessJson = json.dumps(access).encode('utf8')
-
         msg = CUD + b'A' + b'C' + accessJson + END
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to add access")
 
 
     def updAccess(self, ctrllerMac, access):
@@ -79,11 +92,12 @@ class CtrllerMsger(object):
         With them it creates the message to send it to controller (to update).
         It gives the created message to the network manager thread.
         '''
-
         accessJson = json.dumps(access).encode('utf8')
-
         msg = CUD + b'A' + b'U' + accessJson + END
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to update access")
 
 
     def delAccess(self, ctrllerMac, accessId):
@@ -94,7 +108,10 @@ class CtrllerMsger(object):
         '''
         accessId = str(accessId).encode('utf8')
         msg = CUD + b'A' + b'D' + b'{"id": ' + accessId + b'}' + END
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to delete access")
 
 
     def addLiAccess(self, ctrllerMac, liAccess):
@@ -104,11 +121,12 @@ class CtrllerMsger(object):
         With them it creates the message to send it to controller (to add).
         It gives the created message to the network manager thread.
         '''
-
         liAccessJson = json.dumps(liAccess).encode('utf8')
-
         msg = CUD + b'L' + b'C' + liAccessJson + END
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to add limited access")
 
 
     def updLiAccess(self, ctrllerMac, liAccess):
@@ -117,11 +135,12 @@ class CtrllerMsger(object):
         With them it creates the message to send it to controller (to update).
         It gives the created message to the network manager thread.
         '''
-
         liAccessJson = json.dumps(liAccess).encode('utf8')
-
         msg = CUD + b'L' + b'U' + liAccessJson + END
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to update limited access")
 
 
     def delLiAccess(self, ctrllerMac, liAccessId):
@@ -132,8 +151,10 @@ class CtrllerMsger(object):
         '''
         liAccessId = str(liAccessId).encode('utf8')
         msg = CUD + b'L' + b'D' + b'{"id": ' + liAccessId + b'}' + END
-        self.netMngr.sendToCtrller(msg, ctrllerMac)
-
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to delete limited access")
 
 
     def updPerson(self, ctrllerMacsToUpdPrsn, person):
@@ -142,11 +163,13 @@ class CtrllerMsger(object):
         and a person dictionary to create the message.
         '''
         personJson = json.dumps(person).encode('utf8')
-
         msg = CUD + b'P' + b'U' + personJson + END
 
         for ctrllerMac in ctrllerMacsToUpdPrsn:
-            self.netMngr.sendToCtrller(msg, ctrllerMac)
+            try:
+                self.netMngr.sendToCtrller(msg, ctrllerMac)
+            except CtrllerDisconnected:
+                self.logger.warning("Controller disconnected to update person")
 
 
 
@@ -159,7 +182,10 @@ class CtrllerMsger(object):
         msg = CUD + b'P' + b'D' + b'{"id": ' + personId + b'}' + END
         
         for ctrllerMac in ctrllerMacsToDelPrsn:
-            self.netMngr.sendToCtrller(msg, ctrllerMac)
+            try:
+                self.netMngr.sendToCtrller(msg, ctrllerMac)
+            except CtrllerDisconnected:
+                self.logger.warning("Controller disconnected to delete person.")
 
 
 
@@ -167,11 +193,13 @@ class CtrllerMsger(object):
         '''
         Send a message to the controller requesting re sending uncommitted CRUDs.
         '''
-
         msg = RRC + END
 
         for ctrllerMac in ctrllerMacsNotComm:
-            self.netMngr.sendToCtrller(msg, ctrllerMac)
+            try:
+                self.netMngr.sendToCtrller(msg, ctrllerMac)
+            except CtrllerDisconnected:
+                self.logger.warning("Controller disconnected to receive request re send CRUD.")
 
 
 
@@ -180,9 +208,11 @@ class CtrllerMsger(object):
         '''
         Send a message to the controller requesting to be reprovisioned entirely.
         '''
-
         msg = RRP + END
+        #The exception that could throw this method is catched in "reProvController"
+        #method of crud.py
         self.netMngr.sendToCtrller(msg, ctrllerMac)
+
 
 
 
