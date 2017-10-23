@@ -27,7 +27,7 @@ class MsgReceiver(genmngr.GenericMngr):
 
         self.dataBase = database.DataBase(DB_HOST, DB_USER, DB_PASSWD, DB_DATABASE)
 
-        self.commitHndlrs = {'S': self.dataBase.commitPassage,
+        self.commitHndlrs = {'S': self.dataBase.commitDoor,
                              'A': self.dataBase.commitAccess,
                              'L': self.dataBase.commitLiAccess,
                              'P': self.dataBase.commitPerson

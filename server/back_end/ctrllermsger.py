@@ -28,47 +28,47 @@ class CtrllerMsger(object):
 
 
 
-    def addPassage(self, ctrllerMac, passage):
+    def addDoor(self, ctrllerMac, door):
         '''
-        Receives the controller MAC and a dictionary with passage parameters.
+        Receives the controller MAC and a dictionary with door parameters.
         With them it creates the message to send it to controller (to add)
         It gives the created message to the network manager thread.
         '''
-        passageJson = json.dumps(passage).encode('utf8')
-        msg = CUD + b'S' + b'C' + passageJson + END 
+        doorJson = json.dumps(door).encode('utf8')
+        msg = CUD + b'S' + b'C' + doorJson + END 
         try:
             self.netMngr.sendToCtrller(msg, ctrllerMac)
         except CtrllerDisconnected:
-            self.logger.warning("Controller disconnected to add passage")
+            self.logger.warning("Controller disconnected to add door")
 
 
-    def updPassage(self, ctrllerMac, passage):
+    def updDoor(self, ctrllerMac, door):
         '''
-        Receives the controller MAC and a dictionary with passage parameters.
+        Receives the controller MAC and a dictionary with door parameters.
         With them it creates the message to send it to controller (to update).
         It gives the created message to the network manager thread.        
         '''
-        passageJson = json.dumps(passage).encode('utf8')
-        msg = CUD + b'S' + b'U' + passageJson + END
+        doorJson = json.dumps(door).encode('utf8')
+        msg = CUD + b'S' + b'U' + doorJson + END
         try:
             self.netMngr.sendToCtrller(msg, ctrllerMac)
         except CtrllerDisconnected:
-            self.logger.warning("Controller disconnected to update passage")
+            self.logger.warning("Controller disconnected to update door")
 
 
 
-    def delPassage(self, ctrllerMac, passageId):
+    def delDoor(self, ctrllerMac, doorId):
         '''
-        Receives the controller MAC and the passage ID.
+        Receives the controller MAC and the door ID.
         With them it creates the message to send it to controller (to delete).
         It gives the created message to the network manager thread.        
         '''
-        passageId = str(passageId).encode('utf8')
-        msg = CUD + b'S' + b'D' + b'{"id": ' + passageId + b'}' + END
+        doorId = str(doorId).encode('utf8')
+        msg = CUD + b'S' + b'D' + b'{"id": ' + doorId + b'}' + END
         try:
             self.netMngr.sendToCtrller(msg, ctrllerMac)
         except CtrllerDisconnected:
-            self.logger.warning("Controller disconnected to delete passage")
+            self.logger.warning("Controller disconnected to delete door")
 
 
     def addAccess(self, ctrllerMac, access):
