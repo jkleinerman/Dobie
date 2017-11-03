@@ -25,13 +25,13 @@ class MsgReceiver(genmngr.GenericMngr):
         #to have a understandable log file.
         super().__init__('MsgReceiver', exitFlag)
 
-        self.dataBase = database.DataBase(DB_HOST, DB_USER, DB_PASSWD, DB_DATABASE)
+        self.dataBase = None
 
-        self.commitHndlrs = {'S': self.dataBase.commitDoor,
-                             'A': self.dataBase.commitAccess,
-                             'L': self.dataBase.commitLiAccess,
-                             'P': self.dataBase.commitPerson
-                            }
+#        self.commitHndlrs = {'S': self.dataBase.commitDoor,
+#                             'A': self.dataBase.commitAccess,
+#                             'L': self.dataBase.commitLiAccess,
+#                             'P': self.dataBase.commitPerson
+#                            }
     
         self.netToMsgRec = queue.Queue()
 
@@ -44,6 +44,15 @@ class MsgReceiver(genmngr.GenericMngr):
         This is the main method of the thread. Most of the time it is blocked waiting 
         for queue messages coming from the "Network" thread.
         '''
+
+        self.dataBase = database.DataBase(DB_HOST, DB_USER, DB_PASSWD, DB_DATABASE, self)
+
+        self.commitHndlrs = {'S': self.dataBase.commitDoor,
+                             'A': self.dataBase.commitAccess,
+                             'L': self.dataBase.commitLiAccess,
+                             'P': self.dataBase.commitPerson
+                            }
+
 
 
         while True:
