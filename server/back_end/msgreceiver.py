@@ -25,13 +25,14 @@ class MsgReceiver(genmngr.GenericMngr):
         #to have a understandable log file.
         super().__init__('MsgReceiver', exitFlag)
 
+
+        #The creation of this object was moved to the run method to avoid
+        #freezing the main thread when there is no connection to database.
         self.dataBase = None
 
-#        self.commitHndlrs = {'S': self.dataBase.commitDoor,
-#                             'A': self.dataBase.commitAccess,
-#                             'L': self.dataBase.commitLiAccess,
-#                             'P': self.dataBase.commitPerson
-#                            }
+        #Commit handlers were moved to the run method since the dataBase
+        #object and its method doesn't exist yet.
+        self.commitHndlrs = None
     
         self.netToMsgRec = queue.Queue()
 
@@ -45,15 +46,14 @@ class MsgReceiver(genmngr.GenericMngr):
         for queue messages coming from the "Network" thread.
         '''
 
+        #First of all, the database should be connected by the execution of this thread
         self.dataBase = database.DataBase(DB_HOST, DB_USER, DB_PASSWD, DB_DATABASE, self)
-
+        #Now we can set the commit handlers.
         self.commitHndlrs = {'S': self.dataBase.commitDoor,
                              'A': self.dataBase.commitAccess,
                              'L': self.dataBase.commitLiAccess,
                              'P': self.dataBase.commitPerson
                             }
-
-
 
         while True:
             try:
