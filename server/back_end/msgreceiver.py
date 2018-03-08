@@ -33,6 +33,11 @@ class MsgReceiver(genmngr.GenericMngr):
         #Commit handlers were moved to the run method since the dataBase
         #object and its method doesn't exist yet.
         self.commitHndlrs = None
+
+        #The ctrllerMsger is used to send to the controllers the message
+        #to delete the visitors when they pass trough exit doors
+        #The object is set in the main thread
+        self.ctrllerMsger = None
     
         self.netToMsgRec = queue.Queue()
 
@@ -66,6 +71,10 @@ class MsgReceiver(genmngr.GenericMngr):
 
                     event = msg.strip(EVT+END).decode('utf8')
                     event = json.loads(event)
+                    if self.dataBase.isValidVisitExit(event):
+                        ctrllerMacsToDelPrsn = self.dataBase.markPerson(event['personId'], database.TO_DELETE)
+                        self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, event['personId']) 
+
                     events = [event]
                     self.dataBase.saveEvents(events)
 
@@ -74,6 +83,12 @@ class MsgReceiver(genmngr.GenericMngr):
 
                     events = msg[1:-1].split(EVS)
                     events = [json.loads(evnt.decode('utf8')) for evnt in events]
+
+                    for event in events:
+                        if self.dataBase.isValidVisitExit(event):
+                            ctrllerMacsToDelPrsn = self.dataBase.markPerson(event['personId'], database.TO_DELETE)
+                            self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, event['personId'])
+
                     self.dataBase.saveEvents(events)
 
 
