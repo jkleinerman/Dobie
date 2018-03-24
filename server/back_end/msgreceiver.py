@@ -72,8 +72,11 @@ class MsgReceiver(genmngr.GenericMngr):
                     event = msg.strip(EVT+END).decode('utf8')
                     event = json.loads(event)
                     if self.dataBase.isValidVisitExit(event):
-                        ctrllerMacsToDelPrsn = self.dataBase.markPerson(event['personId'], database.TO_DELETE)
-                        self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, event['personId']) 
+                        personId = event['personId']
+                        logMsg = "Visitor exiting. Removing from system person with ID = {}".format(personId)
+                        self.logger.info(logMsg)
+                        ctrllerMacsToDelPrsn = self.dataBase.markPerson(personId, database.TO_DELETE)
+                        self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, personId) 
 
                     events = [event]
                     self.dataBase.saveEvents(events)
@@ -86,8 +89,11 @@ class MsgReceiver(genmngr.GenericMngr):
 
                     for event in events:
                         if self.dataBase.isValidVisitExit(event):
-                            ctrllerMacsToDelPrsn = self.dataBase.markPerson(event['personId'], database.TO_DELETE)
-                            self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, event['personId'])
+                            personId = event['personId']
+                            logMsg = "Visitor exiting. Removing from system person with ID = {}".format(personId)
+                            self.logger.info(logMsg)
+                            ctrllerMacsToDelPrsn = self.dataBase.markPerson(personId, database.TO_DELETE)
+                            self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, personId)
 
                     self.dataBase.saveEvents(events)
 
