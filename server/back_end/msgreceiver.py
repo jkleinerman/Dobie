@@ -114,6 +114,9 @@ class MsgReceiver(genmngr.GenericMngr):
                     else:
                         self.commitHndlrs[crudTypeResp](crudId)
 
+                elif msg.startswith(KAL):
+                    self.logger.info('Receiving Keep Alive Message.')
+
 
             except queue.Empty:
                 #Cheking if Main thread ask as to finish.
