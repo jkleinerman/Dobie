@@ -115,7 +115,12 @@ class MsgReceiver(genmngr.GenericMngr):
                         self.commitHndlrs[crudTypeResp](crudId)
 
                 elif msg.startswith(KAL):
-                    self.logger.info('Receiving Keep Alive Message.')
+                    ctrllerMac = msg.strip(KAL+END).decode('utf8')
+                    self.logger.info('Receiving Keep Alive message from: {}.'.format(ctrllerMac))
+                    try:
+                        self.dataBase.aliveController(ctrllerMac)
+                    except database.ControllerError:
+                        self.logger.info('Controller: {} not found for liveness tracking.'.format(ctrllerMac))
 
 
             except queue.Empty:
