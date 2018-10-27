@@ -216,3 +216,11 @@ class CtrllerMsger(object):
 
 
 
+    def poweroffCtrller(self, ctrllerMac):
+        '''
+        Send a message to the controller requesting to be shut down.
+        '''
+        msg = RPO + END
+        #The exception that could throw this method is catched in "poweroffController"
+        #method of crud.py
+        self.netMngr.sendToCtrller(msg, ctrllerMac)
