@@ -117,11 +117,11 @@ class MsgReceiver(genmngr.GenericMngr):
                 #When the controller sends a Keep Alive message
                 elif msg.startswith(KAL):
                     ctrllerMac = msg.strip(KAL+END).decode('utf8')
-                    self.logger.info('Receiving Keep Alive message from: {}.'.format(ctrllerMac))
+                    self.logger.debug('Receiving Keep Alive message from: {}.'.format(ctrllerMac))
                     try:
                         self.dataBase.setCtrllerReachable(ctrllerMac)
                     except database.ControllerError:
-                        self.logger.info("Controller: {} can't be set alive.".format(ctrllerMac))
+                        self.logger.error("Controller: {} can't be set alive.".format(ctrllerMac))
 
 
             except queue.Empty:
