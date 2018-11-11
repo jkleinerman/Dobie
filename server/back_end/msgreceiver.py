@@ -19,7 +19,7 @@ class MsgReceiver(genmngr.GenericMngr):
     the network thread do not lose time doing things in DB.
     '''
 
-    def __init__(self, exitFlag):
+    def __init__(self, exitFlag, msgRecToRtEvent):
 
         #Invoking the parent class constructor, specifying the thread name, 
         #to have a understandable log file.
@@ -39,6 +39,8 @@ class MsgReceiver(genmngr.GenericMngr):
         #The object is set in the main thread
         self.ctrllerMsger = None
     
+        self.msgRecToRtEvent = msgRecToRtEvent
+
         self.netToMsgRec = queue.Queue()
 
 
@@ -71,6 +73,16 @@ class MsgReceiver(genmngr.GenericMngr):
 
                     event = msg.strip(EVT+END).decode('utf8')
                     event = json.loads(event)
+
+                    try:
+                        #Before sending the event to the events-live.js application,
+                        #it should be formatted adding some fields. This is done
+                        #using "getFmtEvent" function from database.
+                        fmtEvent = self.dataBase.getFmtEvent(event)
+                        self.msgRecToRtEvent.put(fmtEvent)
+                    except database.EventError:
+                        self.logger.warning("Error trying to format event")
+
                     if self.dataBase.isValidVisitExit(event):
                         personId = event['personId']
                         logMsg = "Visitor exiting. Removing from system person with ID = {}".format(personId)
