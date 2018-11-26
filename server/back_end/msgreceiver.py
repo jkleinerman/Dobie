@@ -131,7 +131,11 @@ class MsgReceiver(genmngr.GenericMngr):
                     ctrllerMac = msg.strip(KAL+END).decode('utf8')
                     self.logger.debug('Receiving Keep Alive message from: {}.'.format(ctrllerMac))
                     try:
-                        self.dataBase.setCtrllerReachable(ctrllerMac)
+                        revivedCtrller = self.dataBase.setCtrllerReachable(ctrllerMac)
+                        #If the controller wasn't alive previously, "revivedCtrller" will not be None,
+                        #and a JSON will be sent to "rtevent" thread.
+                        if revivedCtrller:
+                            self.toRtEventQueue.put(revivedCtrller)
                     except database.ControllerError:
                         self.logger.error("Controller: {} can't be set alive.".format(ctrllerMac))
 
