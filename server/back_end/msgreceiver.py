@@ -19,7 +19,7 @@ class MsgReceiver(genmngr.GenericMngr):
     the network thread do not lose time doing things in DB.
     '''
 
-    def __init__(self, exitFlag, msgRecToRtEvent):
+    def __init__(self, exitFlag, toRtEventQueue):
 
         #Invoking the parent class constructor, specifying the thread name, 
         #to have a understandable log file.
@@ -39,7 +39,7 @@ class MsgReceiver(genmngr.GenericMngr):
         #The object is set in the main thread
         self.ctrllerMsger = None
     
-        self.msgRecToRtEvent = msgRecToRtEvent
+        self.toRtEventQueue = toRtEventQueue
 
         self.netToMsgRec = queue.Queue()
 
@@ -79,7 +79,7 @@ class MsgReceiver(genmngr.GenericMngr):
                         #it should be formatted adding some fields. This is done
                         #using "getFmtEvent" function from database.
                         fmtEvent = self.dataBase.getFmtEvent(event)
-                        self.msgRecToRtEvent.put(fmtEvent)
+                        self.toRtEventQueue.put(fmtEvent)
                     except database.EventError:
                         self.logger.warning("Error trying to format event")
 
@@ -131,7 +131,11 @@ class MsgReceiver(genmngr.GenericMngr):
                     ctrllerMac = msg.strip(KAL+END).decode('utf8')
                     self.logger.debug('Receiving Keep Alive message from: {}.'.format(ctrllerMac))
                     try:
-                        self.dataBase.setCtrllerReachable(ctrllerMac)
+                        revivedCtrller = self.dataBase.setCtrllerReachable(ctrllerMac)
+                        #If the controller wasn't alive previously, "revivedCtrller" will not be None,
+                        #and a JSON will be sent to "rtevent" thread.
+                        if revivedCtrller:
+                            self.toRtEventQueue.put(revivedCtrller)
                     except database.ControllerError:
                         self.logger.error("Controller: {} can't be set alive.".format(ctrllerMac))
 
