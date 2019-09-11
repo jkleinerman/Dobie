@@ -74,6 +74,19 @@ class MsgReceiver(genmngr.GenericMngr):
                     event = msg.strip(EVT+END).decode('utf8')
                     event = json.loads(event)
 
+                    #The events coming from the controller have the card number instead of 
+                    #the person id because the person trying to pass a door controlled by this controller,
+                    #couldn't be in this controller (no access in any of the doors controlled by it) but 
+                    #the person could be in the central data base. In this situation it is desirable to 
+                    #show the involved person in the event, also when they are denyied.
+                    #cardNum2PrsnId() function is used to put the person id in the event dictionary and
+                    #remove the card number.
+                    try:
+                        self.dataBase.cardNum2PrsnId(event)
+                    except database.EventError:
+                        self.logger.warning("Error converting cardNumber to personId. Ignoring this event.")
+                        continue
+
                     try:
                         #Before sending the event to the events-live.js application,
                         #it should be formatted adding some fields. This is done
@@ -100,13 +113,18 @@ class MsgReceiver(genmngr.GenericMngr):
                     events = [json.loads(evnt.decode('utf8')) for evnt in events]
 
                     for event in events:
+                        try:
+                            self.dataBase.cardNum2PrsnId(event)
+                        except database.EventError:
+                            self.logger.warning("Error converting cardNumber to personId. Ignoring this event.")
+                            continue
+
                         if self.dataBase.isValidVisitExit(event):
                             personId = event['personId']
                             logMsg = "Visitor exiting. Removing from system person with ID = {}".format(personId)
                             self.logger.info(logMsg)
                             ctrllerMacsToDelPrsn = self.dataBase.markPerson(personId, database.TO_DELETE)
                             self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, personId)
-
                     self.dataBase.saveEvents(events)
 
 
