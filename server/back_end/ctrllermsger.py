@@ -71,6 +71,54 @@ class CtrllerMsger(object):
             self.logger.warning("Controller disconnected to delete door")
 
 
+
+    def addUnlkDoorSkd(self, ctrllerMac, unlkDoorSkd):
+        '''
+        Receives the controller MAC and a dictionary with unlock door
+        schedule parameters.
+        With them it creates the message to send it to controller (to add)
+        It gives the created message to the network manager thread.
+        '''
+        unlkDoorSkdJson = json.dumps(unlkDoorSkd).encode('utf8')
+        msg = CUD + b'U' + b'C' + unlkDoorSkdJson + END
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to add unlock door schedule")
+
+
+
+    def updUnlkDoorSkd(self, ctrllerMac, unlkDoorSkd):
+        '''
+        Receives the controller MAC and a dictionary with unlock door
+        schedule parameters.
+        With them it creates the message to send it to controller (to update).
+        It gives the created message to the network manager thread.
+        '''
+        unlkDoorSkdJson = json.dumps(unlkDoorSkd).encode('utf8')
+        msg = CUD + b'U' + b'U' + unlkDoorSkdJson + END
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to update unlock door schedule")
+
+
+
+    def delUnlkDoorSkd(self, ctrllerMac, unlkDoorSkdId):
+        '''
+        Receives the controller MAC and the unlockk door schedule ID.
+        With them it creates the message to send it to controller (to delete).
+        It gives the created message to the network manager thread.
+        '''
+        unlkDoorSkdId = str(unlkDoorSkdId).encode('utf8')
+        msg = CUD + b'U' + b'D' + b'{"id": ' + unlkDoorSkdId + b'}' + END
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to delete unlock door schedule")
+
+
+
     def addAccess(self, ctrllerMac, access):
         '''
         Receives the controller MAC and access dictionary.
