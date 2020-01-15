@@ -106,7 +106,7 @@ class CtrllerMsger(object):
 
     def delUnlkDoorSkd(self, ctrllerMac, unlkDoorSkdId):
         '''
-        Receives the controller MAC and the unlockk door schedule ID.
+        Receives the controller MAC and the unlock door schedule ID.
         With them it creates the message to send it to controller (to delete).
         It gives the created message to the network manager thread.
         '''
@@ -116,6 +116,54 @@ class CtrllerMsger(object):
             self.netMngr.sendToCtrller(msg, ctrllerMac)
         except CtrllerDisconnected:
             self.logger.warning("Controller disconnected to delete unlock door schedule")
+
+
+
+    def addExcDayUds(self, ctrllerMac, excDayUds):
+        '''
+        Receives the controller MAC and a dictionary with exception day to
+        unlock door by schedule parameters.
+        With them it creates the message to send it to controller (to add)
+        It gives the created message to the network manager thread.
+        '''
+        excDayUdsJson = json.dumps(excDayUds).encode('utf8')
+        msg = CUD + b'E' + b'C' + excDayUdsJson + END
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to add exception day to unlock door by schedule")
+
+
+
+    def updExcDayUds(self, ctrllerMac, excDayUds):
+        '''
+        Receives the controller MAC and a dictionary with exception day to
+        unlock door by schedule parameters.
+        With them it creates the message to send it to controller (to update).
+        It gives the created message to the network manager thread.
+        '''
+        excDayUdsJson = json.dumps(excDayUds).encode('utf8')
+        msg = CUD + b'E' + b'U' + excDayUdsJson + END
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to update exception day to unlock door by schedule")
+
+
+
+    def delExcDayUds(self, ctrllerMac, excDayUdsId):
+        '''
+        Receives the controller MAC and a dictionary with exception day to
+        unlock door by schedule ID.
+        With them it creates the message to send it to controller (to delete).
+        It gives the created message to the network manager thread.
+        '''
+        excDayUdsId = str(excDayUdsId).encode('utf8')
+        msg = CUD + b'E' + b'D' + b'{"id": ' + excDayUdsId + b'}' + END
+        try:
+            self.netMngr.sendToCtrller(msg, ctrllerMac)
+        except CtrllerDisconnected:
+            self.logger.warning("Controller disconnected to delete exception day to unlock door by schedule")
 
 
 
