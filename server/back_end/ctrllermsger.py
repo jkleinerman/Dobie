@@ -72,6 +72,19 @@ class CtrllerMsger(object):
 
 
 
+    def openDoor(self, ctrllerMac, doorId):
+        '''
+        Send a message to the controller requesting to
+        open the door with doorId.
+        '''
+        doorId = str(doorId).encode('utf8')
+        msg = ROD + b'{"id": ' + doorId + b'}' + END
+        #The exception that could throw this method is catched in "openDoor"
+        #method of crud.py
+        self.netMngr.sendToCtrller(msg, ctrllerMac)
+
+
+
     def addUnlkDoorSkd(self, ctrllerMac, unlkDoorSkd):
         '''
         Receives the controller MAC and a dictionary with unlock door
