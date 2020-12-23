@@ -95,8 +95,9 @@ class MsgReceiver(genmngr.GenericMngr):
                         #using "getFmtEvent" function from database.
                         fmtEvent = self.dataBase.getFmtEvent(event)
                         self.toRtEventQueue.put(fmtEvent)
-                    except database.EventError:
-                        self.logger.warning("Error trying to format event")
+                    except database.EventError as eventError:
+                        self.logger.warning("Error trying to format event.")
+                        self.logger.debug(eventError)
 
                     if self.dataBase.isValidVisitExit(event):
                         personId = event['personId']
