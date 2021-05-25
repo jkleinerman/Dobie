@@ -1,9 +1,9 @@
-version: '3.7'
+version: '3.6'
 
 services:
 
   backend:
-    image: "dobie/${IMG_PRFX}backend:latest"
+    image: "dobie/${IMG_PRFX}backend:arm32_stable"
     container_name: backend
     ports:
       - "9797:9797"
@@ -26,7 +26,7 @@ services:
 
 
   database:
-    image: "dobie/${IMG_PRFX}database:latest"
+    image: "dobie/${IMG_PRFX}database:arm32_stable"
     container_name: database
     volumes:
       - database-volume:/var/lib/mysql
@@ -40,7 +40,7 @@ services:
 
 
   webserver:
-    image: "dobie/${IMG_PRFX}webserver:latest"
+    image: "dobie/${IMG_PRFX}webserver:arm32_stable"
     container_name: webserver
     ports:
       - "80:80"
@@ -61,7 +61,7 @@ services:
 
 
   php:
-    image: "dobie/${IMG_PRFX}php:latest"
+    image: "dobie/${IMG_PRFX}php:arm32_stable"
     container_name: php
     volumes:
       - ../front_end:/site
@@ -75,7 +75,7 @@ services:
 
 
   nodejs:
-    image: "dobie/${IMG_PRFX}nodejs:latest"
+    image: "dobie/${IMG_PRFX}nodejs:arm32_stable"
     container_name: nodejs
     ports:
       - "5002:5002"
