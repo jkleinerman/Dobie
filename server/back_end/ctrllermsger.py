@@ -298,13 +298,13 @@ class CtrllerMsger(object):
 
 
 
-    def requestReSendCruds(self, ctrllerMacsNotComm):
+    def requestReSendCruds(self, unCmtCtrllersMacs):
         '''
         Send a message to the controller requesting re sending uncommitted CRUDs.
         '''
         msg = RRC + END
 
-        for ctrllerMac in ctrllerMacsNotComm:
+        for ctrllerMac in unCmtCtrllersMacs:
             try:
                 self.netMngr.sendToCtrller(msg, ctrllerMac)
             except CtrllerDisconnected:
