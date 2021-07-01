@@ -13,15 +13,15 @@ from msgheaders import *
 class MsgReceiver(genmngr.GenericMngr):
     '''
     This thread is created by the main thread.
-    When the network thread receives a message from the controller, it 
-    put the message in "netToMsgRec" queue. This thread get the message
+    When the network thread receives a message from the controller, it
+    put the message in "toMsgRec" queue. This thread get the message
     from the queue and do the necessary operation with DB. In this way
     the network thread do not lose time doing things in DB.
     '''
 
-    def __init__(self, exitFlag, toRtEventQueue):
+    def __init__(self, exitFlag, toCrudReSndr, toRtEvent):
 
-        #Invoking the parent class constructor, specifying the thread name, 
+        #Invoking the parent class constructor, specifying the thread name,
         #to have a understandable log file.
         super().__init__('MsgReceiver', exitFlag)
 
@@ -38,10 +38,14 @@ class MsgReceiver(genmngr.GenericMngr):
         #to delete the visitors when they pass trough exit doors
         #The object is set in the main thread
         self.ctrllerMsger = None
-    
-        self.toRtEventQueue = toRtEventQueue
 
-        self.netToMsgRec = queue.Queue()
+        #This queue will be used to tell the Crud Resender Thread that the
+        #the controller is ready to receive all the data when it is re-provisioned
+        self.toCrudReSndr = toCrudReSndr
+
+        self.toRtEvent = toRtEvent
+
+        self.toMsgRec = queue.Queue()
 
 
 
@@ -49,7 +53,7 @@ class MsgReceiver(genmngr.GenericMngr):
 
     def run(self):
         '''
-        This is the main method of the thread. Most of the time it is blocked waiting 
+        This is the main method of the thread. Most of the time it is blocked waiting
         for queue messages coming from the "Network" thread.
         '''
 
@@ -66,8 +70,8 @@ class MsgReceiver(genmngr.GenericMngr):
 
         while True:
             try:
-                #Blocking until Network thread sends an msg or EXIT_CHECK_TIME expires 
-                msg = self.netToMsgRec.get(timeout=EXIT_CHECK_TIME)
+                #Blocking until Network thread sends an msg or EXIT_CHECK_TIME expires
+                msg = self.toMsgRec.get(timeout=EXIT_CHECK_TIME)
                 self.checkExit()
 
                 #When the controller sends an Event
@@ -76,10 +80,10 @@ class MsgReceiver(genmngr.GenericMngr):
                     event = msg.strip(EVT+END).decode('utf8')
                     event = json.loads(event)
 
-                    #The events coming from the controller have the card number instead of 
+                    #The events coming from the controller have the card number instead of
                     #the person id because the person trying to pass a door controlled by this controller,
-                    #couldn't be in this controller (no access in any of the doors controlled by it) but 
-                    #the person could be in the central data base. In this situation it is desirable to 
+                    #couldn't be in this controller (no access in any of the doors controlled by it) but
+                    #the person could be in the central data base. In this situation it is desirable to
                     #show the involved person in the event, also when they are denyied.
                     #cardNum2PrsnId() function is used to put the person id in the event dictionary and
                     #remove the card number.
@@ -94,7 +98,7 @@ class MsgReceiver(genmngr.GenericMngr):
                         #it should be formatted adding some fields. This is done
                         #using "getFmtEvent" function from database.
                         fmtEvent = self.dataBase.getFmtEvent(event)
-                        self.toRtEventQueue.put(fmtEvent)
+                        self.toRtEvent.put(fmtEvent)
                     except database.EventError as eventError:
                         self.logger.warning("Error trying to format event.")
                         self.logger.debug(eventError)
@@ -104,7 +108,7 @@ class MsgReceiver(genmngr.GenericMngr):
                         logMsg = "Visitor exiting. Removing from system person with ID = {}".format(personId)
                         self.logger.info(logMsg)
                         ctrllerMacsToDelPrsn = self.dataBase.markPerson(personId, database.TO_DELETE)
-                        self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, personId) 
+                        self.ctrllerMsger.delPerson(ctrllerMacsToDelPrsn, personId)
 
                     events = [event]
                     self.dataBase.saveEvents(events)
@@ -133,7 +137,7 @@ class MsgReceiver(genmngr.GenericMngr):
 
                 #When the controller sends a response to CRUD message
                 elif msg.startswith(RCUD):
-                    
+
                     crudResponse = msg.strip(RCUD+END).decode('utf8')
                     crudId = re.search('"id":\s*(\d*)', crudResponse).groups()[0]
                     crudTypeResp = crudResponse[0]
@@ -156,15 +160,27 @@ class MsgReceiver(genmngr.GenericMngr):
                         #If the controller wasn't alive previously, "revivedCtrller" will not be None,
                         #and a JSON will be sent to "rtevent" thread.
                         if revivedCtrller:
-                            self.toRtEventQueue.put(revivedCtrller)
+                            self.toRtEvent.put(revivedCtrller)
                     except database.ControllerError:
                         self.logger.error("Controller: {} can't be set alive.".format(ctrllerMac))
 
 
+                #When the controller sends a response to Request Re Provisioning message
+                elif msg.startswith(RRRP):
+                    ctrllerMac = msg.strip(RRRP+END).decode('utf8')
+                    self.logger.debug(f'Receiving Response to Request re-provisioning message from: {ctrllerMac}.')
+                    try:
+                        #Since the controller answered with RRRP, we are sure that it
+                        #cleared its DB. The following line, sets all the CRUDs of this
+                        #controller to state: TO_ADD in the server DB.
+                        self.dataBase.reProvController(ctrllerMac)
+                        #Now, the MAC of this controller is sent to CrudReSndr Thread
+                        #to tell him to re-provision this controller
+                        self.toCrudReSndr.put(ctrllerMac)
+                    except (database.ControllerError, database.ControllerNotFound) as reProvError:
+                        self.logger.debug(reProvError)
+                        self.logger.error(f'Error re-provisioning controller: {ctrllerMac}')
+
             except queue.Empty:
-                #Cheking if Main thread ask as to finish.
+                #Cheking if Main thread ask us to finish.
                 self.checkExit()
-
-
-
-
