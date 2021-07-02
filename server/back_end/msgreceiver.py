@@ -174,6 +174,12 @@ class MsgReceiver(genmngr.GenericMngr):
                         #cleared its DB. The following line, sets all the CRUDs of this
                         #controller to state: TO_ADD in the server DB.
                         self.dataBase.reProvController(ctrllerMac)
+                        #Remove the flag that indicates that the controller need re-prov
+                        #Although the controller wouldn't receive all the CRUDs, the flag
+                        #is removed because the CRUDs that correspond to this controller
+                        #are in state: TO_ADD. The "CrurdRsndr" thread will try periodically
+                        #to send the them
+                        self.dataBase.setCtrllerReProvState(ctrllerMac, False)
                         #Now, the MAC of this controller is sent to CrudReSndr Thread
                         #to tell him to re-provision this controller
                         self.toCrudReSndr.put(ctrllerMac)
