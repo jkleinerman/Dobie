@@ -35,7 +35,7 @@ class CtrllerMsger(object):
         It gives the created message to the network manager thread.
         '''
         doorJson = json.dumps(door).encode('utf8')
-        msg = CUD + b'S' + b'C' + doorJson + END 
+        msg = CUD + b'S' + b'C' + doorJson + END
         try:
             self.netMngr.sendToCtrller(msg, ctrllerMac)
         except CtrllerDisconnected:
@@ -46,7 +46,7 @@ class CtrllerMsger(object):
         '''
         Receives the controller MAC and a dictionary with door parameters.
         With them it creates the message to send it to controller (to update).
-        It gives the created message to the network manager thread.        
+        It gives the created message to the network manager thread.
         '''
         doorJson = json.dumps(door).encode('utf8')
         msg = CUD + b'S' + b'U' + doorJson + END
@@ -61,7 +61,7 @@ class CtrllerMsger(object):
         '''
         Receives the controller MAC and the door ID.
         With them it creates the message to send it to controller (to delete).
-        It gives the created message to the network manager thread.        
+        It gives the created message to the network manager thread.
         '''
         doorId = str(doorId).encode('utf8')
         msg = CUD + b'S' + b'D' + b'{"id": ' + doorId + b'}' + END
@@ -289,7 +289,7 @@ class CtrllerMsger(object):
         '''
         personId = str(personId).encode('utf8')
         msg = CUD + b'P' + b'D' + b'{"id": ' + personId + b'}' + END
-        
+
         for ctrllerMac in ctrllerMacsToDelPrsn:
             try:
                 self.netMngr.sendToCtrller(msg, ctrllerMac)
@@ -313,13 +313,13 @@ class CtrllerMsger(object):
 
 
 
-    def requestReProv(self, ctrllerMac):
+    def requestResync(self, ctrllerMac):
         '''
-        Send a message to the controller requesting to be reprovisioned entirely.
+        Send a message to the controller requesting to be resynced entirely.
         '''
-        msg = RRP + END
-        #The exception that could throw this method is catched in "reProvController"
-        #method of crud.py
+        msg = RRS + END
+        #The exception that could throw this method is catched
+        #in "resyncController" method of crud.py
         self.netMngr.sendToCtrller(msg, ctrllerMac)
 
 

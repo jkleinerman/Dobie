@@ -40,7 +40,7 @@ class MsgReceiver(genmngr.GenericMngr):
         self.ctrllerMsger = None
 
         #This queue will be used to tell the Crud Resender Thread that the
-        #the controller is ready to receive all the data when it is re-provisioned
+        #the controller is ready to receive all the data when it is resynced
         self.toCrudReSndr = toCrudReSndr
 
         self.toRtEvent = toRtEvent
@@ -165,27 +165,27 @@ class MsgReceiver(genmngr.GenericMngr):
                         self.logger.error("Controller: {} can't be set alive.".format(ctrllerMac))
 
 
-                #When the controller sends a response to Request Re Provisioning message
-                elif msg.startswith(RRRP):
-                    ctrllerMac = msg.strip(RRRP+END).decode('utf8')
-                    self.logger.debug(f'Receiving Response to Request re-provisioning message from: {ctrllerMac}.')
+                #When the controller sends a Response to Request Resync message
+                elif msg.startswith(RRRS):
+                    ctrllerMac = msg.strip(RRRS+END).decode('utf8')
+                    self.logger.debug(f'Receiving Response to Request Resync message from: {ctrllerMac}.')
                     try:
-                        #Since the controller answered with RRRP, we are sure that it
+                        #Since the controller answered with RRRS, we are sure that it
                         #cleared its DB. The following line, sets all the CRUDs of this
                         #controller to state: TO_ADD in the server DB.
-                        self.dataBase.reProvController(ctrllerMac)
-                        #Remove the flag that indicates that the controller need re-prov
+                        self.dataBase.resyncController(ctrllerMac)
+                        #Remove the flag that indicates that the controller need resync
                         #Although the controller wouldn't receive all the CRUDs, the flag
                         #is removed because the CRUDs that correspond to this controller
                         #are in state: TO_ADD. The "CrurdRsndr" thread will try periodically
                         #to send the them
-                        self.dataBase.setCtrllerReProvState(ctrllerMac, False)
+                        self.dataBase.setCtrllerResyncState(ctrllerMac, False)
                         #Now, the MAC of this controller is sent to CrudReSndr Thread
-                        #to tell him to re-provision this controller
+                        #to tell him to resync this controller
                         self.toCrudReSndr.put(ctrllerMac)
-                    except (database.ControllerError, database.ControllerNotFound) as reProvError:
-                        self.logger.debug(reProvError)
-                        self.logger.error(f'Error re-provisioning controller: {ctrllerMac}')
+                    except (database.ControllerError, database.ControllerNotFound) as resyncError:
+                        self.logger.debug(resyncError)
+                        self.logger.error(f'Error resyncing controller: {ctrllerMac}')
 
             except queue.Empty:
                 #Cheking if Main thread ask us to finish.
